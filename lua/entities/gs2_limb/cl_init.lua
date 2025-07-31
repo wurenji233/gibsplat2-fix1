@@ -73,6 +73,10 @@ net.Receive("GS2Dissolve", function()
 	end
 end)
 
+function mylog(msg)
+//	print(string.format("[GS2-mylog][%s][%s] %s",os.date("%X"),os.clock(),msg))
+end
+
 local decals = {
 	flesh = "Blood",
 	no_decal = "Blood", --metrocop head
@@ -323,6 +327,7 @@ function ENT:UpdateChildBonesRec(bone, mask, bone_override)
 		}
 	end
 	for _, child_bone in ipairs(self:GetChildBones(bone) or dummy_tbl) do
+		mylog("A")
 		if bone_override then
 			self:UpdateChildBonesRec(child_bone, mask, bone_override)
 		else
@@ -360,6 +365,7 @@ function ENT:UpdateRenderInfo()
 	--Checks if any other parts of the ragdoll are attached to us
 	local is_lonely = true
 	for _, part_info in ipairs(GetModelConstraintInfo(self:GetModel())) do
+		mylog("C")
 		if part_info.parent == self_phys_bone and bit_band(dis_mask, bit_lshift(1, part_info.child)) == 0 then
 			is_lonely = false
 			break			

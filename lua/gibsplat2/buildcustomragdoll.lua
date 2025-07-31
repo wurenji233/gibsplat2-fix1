@@ -230,6 +230,18 @@ end
 
 local ENTITY = FindMetaTable("Entity")
 
+local function CopyFlexData(source, target)
+	if !IsValid(source) or !IsValid(target) then return end
+	
+	-- 复制FlexScale
+	target:SetFlexScale(source:GetFlexScale())
+	
+	-- 复制所有Flex权重
+	for i = 0, source:GetFlexNum() - 1 do
+		target:SetFlexWeight(i, source:GetFlexWeight(i))
+	end
+end
+
 function ENTITY:GS2IsDismembered(phys_bone)
 	return bit_band(self:GetNWInt("GS2DisMask", 0), bit_lshift(1, phys_bone)) != 0
 end
@@ -400,7 +412,7 @@ function ENTITY:GS2Gib(phys_bone, no_gibs, forcegib)
 				SafeRemoveEntity(const.Constraint)
 			end
 		end
- 		
+		
 		for _, limb in pairs(self.GS2Limbs) do
 			if IsValid(limb) then
 				limb:SetGibMask(mask)
@@ -508,10 +520,10 @@ function ENTITY:MakeCustomRagdoll()
 	--Damaging ragdolls behaves wierdly when they're picked apart so use these instead
 	for phys_bone = 0, self:GetPhysicsObjectCount()-1 do
 		local phys = self:GetPhysicsObjectNum(phys_bone)
-		local relay = ents_Create("gs2_limb_relay")	
+		local relay = ents_Create("gs2_limb_relay")    
 		relay:SetTarget(self, phys_bone)
 		relay:Spawn()
-		self.GS2LimbRelays[phys_bone] = relay		
+		self.GS2LimbRelays[phys_bone] = relay        
 	end
 
 	PutInRagdollPose(self)
@@ -519,16 +531,28 @@ function ENTITY:MakeCustomRagdoll()
 		self:RemoveInternalConstraint()
 	end
 	self:DrawShadow(false)
-	
+
 	self.GS2Joints = {}
 
 	local mdl = self:GetModel()
 
 	local CONST_INFO = GetModelConstraintInfo(mdl)
-	
+
 	self.GS2Joints.CONST_INFO = CONST_INFO
 
 	local const_system = self.GS2ConstraintSystem
+
+	-- flex data synchronization
+	self.lastFlexScale = self:GetFlexScale()
+	self.lastWeights = {}
+	for i = 0, self:GetFlexNum() - 1 do
+		self.lastWeights[i] = self:GetFlexWeight(i)
+	end
+
+	-- copy original ragdoll's flex data
+	if self.GS2OriginalEntity and IsValid(self.GS2OriginalEntity) then
+		CopyFlexData(self.GS2OriginalEntity, self)
+	end
 
 	if !const_system then
 		const_system = ents_Create("phys_constraintsystem")

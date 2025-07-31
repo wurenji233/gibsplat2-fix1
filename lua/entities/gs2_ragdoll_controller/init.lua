@@ -96,8 +96,27 @@ function ENT:Die(time)
 	SafeRemoveEntityDelayed(self, time)
 end
 
+function ENT:CopyFlexData(source)
+	if !IsValid(source) then return end
+	
+	-- copy FlexScale
+	local flexScale = source:GetFlexScale()
+	self:SetFlexScale(flexScale)
+	
+	-- copy all Flex weights
+	local weights = {}
+	for i = 0, source:GetFlexNum() - 1 do
+		weights[i] = source:GetFlexWeight(i)
+	end
+	self:SetFlexWeights(util.TableToJSON(weights))
+end
+
 function ENT:Initialize()
 	local mode = self:GetMode()
+	
+	-- initialize flex data
+	self:SetFlexScale(1)
+	self:SetFlexWeights("")
 
 	self:SetModel("models/police.mdl")
 	if (mode == 1) then
