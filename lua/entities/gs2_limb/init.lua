@@ -20,10 +20,13 @@ function ENT:Initialize()
 	self:AddEffects(EF_BONEMERGE)
 	
 	-- Copy facial expression data from source model
+
 	self:SetFlexScale(body:GetFlexScale())
 	for i = 0, body:GetFlexNum() - 1 do
 		self:SetFlexWeight(i, body:GetFlexWeight(i))
 	end
+
+
 
 	self:SetLightingOriginEntity(body.GS2LimbRelays[self:GetTargetBone()])
 
@@ -41,7 +44,7 @@ function ENT:Initialize()
 	
 
 	-- Add Think function to update facial expressions
-/*
+
 
 	self.Think = function()
 		if IsValid(body) then
@@ -65,7 +68,7 @@ function ENT:Initialize()
 		self:NextThink(CurTime())
 		return true
 	end
-	*/
+	
 	-- Initialize last facial expression data for change detection
 	self.LastFlexScale = body:GetFlexScale()
 	self.LastFlexWeights = {}
