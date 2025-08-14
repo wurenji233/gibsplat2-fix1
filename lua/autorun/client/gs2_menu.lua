@@ -1,3 +1,8 @@
+if not localify then
+    include("gibsplat2/localify.lua")
+end
+include("gibsplat2/localization.lua")
+
 local defaults =
 {
     ["gs2_bloodpool_size"] = "10",
@@ -38,98 +43,94 @@ concommand.Add("gs2_reset_cvars", function()
 end)
 
 local function PopulateGS2Menu(pnl)
-    pnl:CheckBox("Enabled", "gs2_enabled")
-    pnl:ControlHelp("Enable or disable the addon.")
 
-    pnl:CheckBox("Keep Corpses", "ai_serverragdolls")
-    pnl:ControlHelp("This needs to be on to be able to gib NPCs.")
+    pnl:CheckBox(localify.Localize("#addon.gibsplat2.enabled"), "gs2_enabled")
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_enabled"))
+
+    pnl:CheckBox(localify.Localize("#addon.gibsplat2.keep_corpses"), "ai_serverragdolls")
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_keep_corpses"))
 
     if LocalPlayer():IsAdmin() then
-        pnl:Button("Cleanup Gibs", "gs2_cleargibs_sv")
+        pnl:Button(localify.Localize("#addon.gibsplat2.cleanup_gibs"), "gs2_cleargibs_sv")
     else
-        pnl:Button("Cleanup Gibs", "gs2_cleargibs")
+        pnl:Button(localify.Localize("#addon.gibsplat2.cleanup_gibs"), "gs2_cleargibs")
     end
     
-    pnl:Button("Reset Settings", "gs2_reset_cvars")
+    pnl:Button(localify.Localize("#addon.gibsplat2.reset_settings"), "gs2_reset_cvars")
 
-    pnl:CheckBox("Default Ragdolls", "gs2_default_ragdolls")
-    pnl:ControlHelp("Controls if all ragdolls should be gibbable.")
+    pnl:CheckBox(localify.Localize("#addon.gibsplat2.default_ragdolls"), "gs2_default_ragdolls")
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_default_ragdolls"))
 
-    pnl:CheckBox("Player Ragdolls", "gs2_player_ragdolls")
-    pnl:ControlHelp("Controls if player ragdolls should be gibbable.")
+    pnl:CheckBox(localify.Localize("#addon.gibsplat2.player_ragdolls"), "gs2_player_ragdolls")
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_player_ragdolls"))
 
-    pnl:CheckBox("Lua Effects", "gs2_old_effects")
-    pnl:ControlHelp("Turn Lua based particle effects on or off.")
+    pnl:CheckBox(localify.Localize("#addon.gibsplat2.lua_effects"), "gs2_old_effects")
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_lua_effects"))
 
-    pnl:CheckBox("Effects", "gs2_new_effects")
-    pnl:ControlHelp("Turn particle effects on or off.")
+    pnl:CheckBox(localify.Localize("#addon.gibsplat2.effects"), "gs2_new_effects")
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_effects"))
 
-    pnl:CheckBox("Expensive Gibs", "gs2_gib_expensive")
-    pnl:ControlHelp("Controls if gibs should use a detailed physics mesh.")
+    pnl:CheckBox(localify.Localize("#addon.gibsplat2.expensive_gibs"), "gs2_gib_expensive")
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_expensive_gibs"))
 
-    pnl:CheckBox("Custom Gibs", "gs2_gib_custom")
-    pnl:ControlHelp("Controls wheter to use custom model gibs or not (ribs etc)")
+    pnl:CheckBox(localify.Localize("#addon.gibsplat2.custom_gibs"), "gs2_gib_custom")
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_custom_gibs"))
 
-    pnl:CheckBox("Serverside Gibs", "gs2_gib_sv")
-    pnl:ControlHelp("Controls if gibs should be created server-side.")
+    pnl:CheckBox(localify.Localize("#addon.gibsplat2.sv_gibs"), "gs2_gib_sv")
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_sv_gibs"))
 
-    pnl:CheckBox("Clientside Gibs", "gs2_gib_cl")
-    pnl:ControlHelp("Controls if gibs should be created client-side")
+    pnl:CheckBox(localify.Localize("#addon.gibsplat2.cl_gibs"), "gs2_gib_cl")
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_cl_gibs"))
 
-    --this is broken :(
-    --pnl:CheckBox("Less Limbs", "gs2_less_limbs")
-    --pnl:ControlHelp("Limits the amount of pieces a ragdoll can be cut into.")
+    pnl:CheckBox(localify.Localize("#addon.gibsplat2.expensive_joints"), "gs2_pull_limb")
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_expensive_joints"))
 
-    pnl:CheckBox("Expensive Joints", "gs2_pull_limb")
-    pnl:ControlHelp("Controls wheter joints can break from stress.")
 
-    --int options
+    -- pnl:NumSlider(localify.Localize("#addon.gibsplat2.max_decal_transfer"), "gs2_max_decals_transfer", 0, 15)
+    -- pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_max_decal_transfer"))
 
-    pnl:NumSlider("Max Decal Transfer", "gs2_max_decals_transfer", 0, 15)
-    pnl:ControlHelp("Maximum number of decals to transfer to a mesh part.")
+    pnl:NumSlider(localify.Localize("#addon.gibsplat2.gib_limit"), "gs2_max_gibs", 0, 512)
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_gib_limit"))
 
-    pnl:NumSlider("Gib Limit", "gs2_max_gibs", 0, 512)
-    pnl:ControlHelp("Controls how many gibs can exist in the map.")
+    -- pnl:NumSlider(localify.Localize("#addon.gibsplat2.particle_limit"), "gs2_max_particles", 0, 500)
+    -- pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_particle_limit"))
 
-    pnl:NumSlider("Particle Limit", "gs2_max_particles", 0, 500)
-    pnl:ControlHelp("Controls how many particles can exist in the map.")
+    pnl:NumSlider(localify.Localize("#addon.gibsplat2.health_multiplier"), "gs2_health_multiplier", 0, 10, 3)
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_health_multiplier"))
 
-    --float options
-    pnl:NumSlider("Health Multiplier", "gs2_health_multiplier", 0, 10, 3)
-    pnl:ControlHelp("The health of each body part will be multiplied by this.")
+    pnl:NumSlider(localify.Localize("#addon.gibsplat2.explosion_gib_chance"), "gs2_gib_chance", 0, 1, 3)
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_explosion_gib_chance"))
 
-    pnl:NumSlider("Explosion gib Chance", "gs2_gib_chance", 0, 1, 3)
-    pnl:ControlHelp("The chance of a ragdoll gibbing from explosion damage.")
+    -- pnl:NumSlider(localify.Localize("#addon.gibsplat2.explosion_chance"), "gs2_gib_chance_explosion_multiplier", 0, 50, 3)
+    -- pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_explosion_chance"))
 
-    pnl:NumSlider("Explosion Chance", "gs2_gib_chance_explosion_multiplier", 0, 50, 3)
-    pnl:ControlHelp("How much more likely the ragdoll is to gib from an explosion.")
+    pnl:NumSlider(localify.Localize("#addon.gibsplat2.gib_spawnrate"), "gs2_gib_factor", 0, 1, 3)
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_gib_spawnrate"))
 
-    pnl:NumSlider("Gib Spawnrate", "gs2_gib_factor", 0, 1, 3)
-    pnl:ControlHelp("Controls how many gibs to spawn.")
+    pnl:NumSlider(localify.Localize("#addon.gibsplat2.gib_merge_chance"), "gs2_gib_merge_chance", 0, 1, 3)
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_gib_merge_chance"))
 
-    pnl:NumSlider("Gib Merge Chance", "gs2_gib_merge_chance", 0, 1, 3)
-    pnl:ControlHelp("The chance of smaller gibs sticking together.")
+    pnl:NumSlider(localify.Localize("#addon.gibsplat2.gib_lifetime"), "gs2_gib_lifetime", 0, 1000)
+    pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_gib_lifetime"))
 
-    pnl:NumSlider("Gib Lifetime", "gs2_gib_lifetime", 0, 1000)
-    pnl:ControlHelp("Controls how long gibs stay before disappearing.")
+    -- pnl:NumSlider(localify.Localize("#addon.gibsplat2.particle_lifetime"), "gs2_particles_lifetime", 1, 500, 3)
+    -- pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_particle_lifetime"))
 
-    pnl:NumSlider("Particle Lifetime", "gs2_particles_lifetime", 1, 500, 3)
-    pnl:ControlHelp("Controls how long a particle stays.")
-
-    pnl:NumSlider("Particle Linger Chance", "gs2_particles_linger_chance", 0, 1, 3)
-    pnl:ControlHelp("The chance of a particle sticking to a surface.")
+    -- pnl:NumSlider(localify.Localize("#addon.gibsplat2.particle_linger_chance"), "gs2_particles_linger_chance", 0, 1, 3)
+    -- pnl:ControlHelp(localify.Localize("#addon.gibsplat2.desc_particle_linger_chance"))
 end
 
 -- Check if sandbox is active gamemode and add in the settings
 if engine.ActiveGamemode() == "sandbox" then
     hook.Add("AddToolMenuCategories", "GibSplat2Category", function() 
-        spawnmenu.AddToolCategory("Utilities", "GibSplat2", "GibSplat 2")
+        spawnmenu.AddToolCategory("Utilities", "GibSplat2", localify.Localize("#addon.gibsplat2.name"))
     end)
 
     hook.Add("PopulateToolMenu", "GibSplat2MenuSettings", function() 
-        spawnmenu.AddToolMenuOption("Utilities", "GibSplat2", "GS2Settings", "Settings", "", "", function(pnl)
+        spawnmenu.AddToolMenuOption("Utilities", "GibSplat2", "GS2Settings", 
+            localify.Localize("#addon.gibsplat2.settings"), "", "", function(pnl)
             pnl:ClearControls()
-            pnl:Help("Here you can change the GibSplat 2 settings.")
+            pnl:Help(localify.Localize("#addon.gibsplat2.menu_help"))
             PopulateGS2Menu(pnl)
         end)
     end)
